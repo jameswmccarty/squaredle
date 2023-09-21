@@ -4,9 +4,6 @@
 
 from collections import deque
 
-# global
-word_list = set()
-
 move_list = { (0,1)   : 'D',
 			  (0,-1)  : 'U',
 			  (1,0)   : 'R',
@@ -20,26 +17,23 @@ class Node:
 
 	def __init__(self):
 		self.children = dict()
-
-	def insert(self,value):
-		if len(value) > 0:
-			if value[0] not in self.children:
-				self.children[value[0]] = Node()
-			self.children[value[0]].insert(value[1:])
+		self.end = False
 
 	def test(self,char):
 		return char in self.children.keys()
+
+	def insert(self,value):
+		if len(value) == 0:
+			self.end = True
+		elif len(value) > 0:
+			if not self.test(value[0]):
+				self.children[value[0]] = Node()
+			self.children[value[0]].insert(value[1:])
 
 	def walk(self,char):
 		if self.test(char):
 			return self.children[char]
 		return None
-
-def build_prefix_map(words):
-	root = Node()
-	for entry in words:
-		root.insert(entry)
-	return root
 
 def words_from_pos(index,dims,letters,prefix_map):
 	found = set()
@@ -49,7 +43,7 @@ def words_from_pos(index,dims,letters,prefix_map):
 	while len(q) > 0:
 		pos,built,moves,seen,location = q.popleft()
 		x,y = pos
-		if built in word_list and len(built) > 3:
+		if location.end and len(built) > 3:
 			found.add((built,moves[1:]))
 		for dx,dy in move_list.keys():
 			nx,ny = x+dx,y+dy
@@ -69,13 +63,12 @@ def solve(puzzle,dims,prefix_map):
 
 if __name__ == "__main__":
 
+	root = Node()
 	with open("enable1.txt","r") as infile:
-		word_list = { line.strip().upper() for line in infile }
-	
-	root = build_prefix_map(word_list)
+		for line in infile:
+			root.insert(line.strip().upper())
 
 	#solve("CDHEEYOTENTFANRA",(4,4),root)
 
 	solve("VRLTOGANIKSGMLAEUOLBRDWPF",(5,5),root)
-
-
+	#solve("XYHWITSIINCELNSECNDSEYGUIROTTETLASPNEITXSBTHCATUTJOILICHLCIOINROTALANCTYAKUYRLTDIULNTERIZEXENOVEQUSA",(10,10),root)
