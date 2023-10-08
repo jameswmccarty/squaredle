@@ -50,9 +50,7 @@ def words_from_pos(index,dims,letters,prefix_map):
 			if nx >= 0 and nx < dims[0] and ny >= 0 and ny < dims[1]:
 				next_letter = letters[ny*dims[0]+nx]
 				if (nx,ny) not in seen and location.test(next_letter):
-					next_seen = seen.copy()
-					next_seen.add((nx,ny))
-					q.append(((nx,ny),built+next_letter,moves+','+move_list[(dx,dy)],next_seen,location.walk(next_letter)))
+					q.append(((nx,ny),built+next_letter,moves+','+move_list[(dx,dy)],{*seen,(nx,ny)},location.walk(next_letter)))
 	return sorted(found)
 
 def solve(puzzle,dims,prefix_map):
